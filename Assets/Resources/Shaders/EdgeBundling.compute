@@ -1,0 +1,153 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel GlobalStep
+#pragma kernel LocalStep
+#pragma kernel SmoothingStep
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+
+Texture2D<float4> edgePositions;
+RWTexture2D<float4> outputTexture;
+
+struct edgeData
+{
+	float connectivity;
+	int startNodeID;
+	int endNodeID;
+};
+
+RWStructuredBuffer<edgeData> edgeDataBuffer;
+
+int maxSegmentNumber;
+int nEdges;
+float compatibilityThreshold;
+float Kattract;
+float Kspring;
+float KdiminishingFactor;
+
+float distanceScalingFactor;
+float maxAttractionForce;
+float maxSpringForce;
+float minControlPointDistance;
+
+StructuredBuffer<int> controlPointsIndex;
+int nControlPoints;
+
+
+
+float CompatibilityScore(float3 P1, float3 P2, float3 Q1, float3 Q2)
+{
+	float3 edgeP = P2 - P1;
+	float3 edgeQ = Q2 - Q1;
+
+	float pLength = sqrt(dot(edgeP, edgeP));
+	float qLength = sqrt(dot(edgeQ, edgeQ));
+
+	float lavg = (pLength + qLength) / 2.0f;
+
+	float angleCompatibility = abs(dot(edgeP, edgeQ) / (pLength * qLength));
+	angleCompatibility *= angleCompatibility;
+	float scaleCompatibility = 2.0f / (lavg * min(pLength, qLength) + max(pLength, qLength) / lavg);
+	float positionCompatibility = lavg / (lavg + distance((P1 + P2) / 2.0f, (Q1 + Q2) / 2.0f));
+
+	/*float nodalCompatibility = 1.0f;
+	if (nodeP1 == nodeQ1 || nodeP1 == nodeQ2 || nodeP2 == nodeQ1 || nodeP2 == nodeQ2)
+	    nodalCompatibility = 2.0f;*/
+
+	return angleCompatibility * scaleCompatibility * positionCompatibility;
+}
+
+
+float AttractionForce(float distance, float distanceScalingFactor = 1.0f, float compatibility = 1.0f, float weight1 = 1.0f, float weight2 = 1.0f, float maxForce = 1.0e6f)
+ {
+     float squaredDistance = (distanceScalingFactor * distance) * (distanceScalingFactor * distance);
+     float forceMagnitude = compatibility * sqrt(weight1 * weight2);
+     forceMagnitude /= squaredDistance;
+     forceMagnitude = min(forceMagnitude, maxForce);
+     return forceMagnitude;
+}
+
+float SpringForce(float distance, float scalingFactor = 1.0f)
+{
+     float scaledDistance = scalingFactor * distance;
+     float forceMagnitude = scaledDistance * scaledDistance;
+     return forceMagnitude;
+}
+
+
+[numthreads(1, 1023, 1)]
+void GlobalStep (uint3 id : SV_DispatchThreadID)
+{
+	for (int i = 0; i < maxSegmentNumber + 1; i++)
+		outputTexture[uint2(i, id.y)] = edgePositions[uint2(i, id.y)];
+
+	for (int pP = 1; pP < nControlPoints - 1; pP++)
+	{
+		float3 Pstart = edgePositions[uint2(controlPointsIndex[pP - 1], id.y)];
+		float3 Pend = edgePositions[uint2(controlPointsIndex[pP + 1], id.y)];
+		float3 Pactive = 0.5 * (Pstart + Pend);
+	
+		float3 activePointDisplacement = float3(0, 0, 0);
+
+		for (int q = 0; q < nEdges; q++)
+		{
+			float compatibilityScore = CompatibilityScore(edgePositions[uint2(0, id.y)], edgePositions[uint2(maxSegmentNumber, id.y)],
+				edgePositions[uint2(0, q)], edgePositions[uint2(maxSegmentNumber, q)]);
+
+			if (q == id.y || compatibilityScore < compatibilityThreshold)
+				continue;
+
+			for (int pQ = 1; pQ < nControlPoints-1; pQ++)
+			{
+				float3 Qactive = edgePositions[uint2(controlPointsIndex[pQ], q)];
+				float distancePQ = distance(Pactive, Qactive);
+				float proximityMask = distancePQ >= minControlPointDistance;
+
+				float attractionForce = AttractionForce(distancePQ, distanceScalingFactor, compatibilityScore, abs(edgeDataBuffer[id.y].connectivity), abs(edgeDataBuffer[q].connectivity), maxAttractionForce);
+				float3 pAttractionForce = Qactive - Pactive;
+				if (length(pAttractionForce) > 0)
+					pAttractionForce = normalize(pAttractionForce);
+				activePointDisplacement += (proximityMask * (attractionForce / float(nControlPoints)) * pAttractionForce) / max(abs(edgeDataBuffer[id.y].connectivity), 0.8); //!!!
+			}
+		}
+		outputTexture[uint2(controlPointsIndex[pP], id.y)] = float4(Pactive + Kattract * activePointDisplacement, nControlPoints);
+	}
+}
+
+[numthreads(1, 1023, 1)]
+void LocalStep(uint3 id : SV_DispatchThreadID)
+{
+
+	for (int pP = 1; pP < nControlPoints - 1; pP++)
+	{
+		float3 Pstart = edgePositions[uint2(controlPointsIndex[pP - 1], id.y)];
+		float3 Pactive = edgePositions[uint2(controlPointsIndex[pP], id.y)];
+		float3 Pend = edgePositions[uint2(controlPointsIndex[pP + 1], id.y)];
+
+		float3 springLeft = Pstart - Pactive;
+		float3 springRight = Pend - Pactive;
+		float3 springForce = normalize(springLeft) * SpringForce(length(springLeft), distanceScalingFactor) 
+			+ normalize(springRight) * SpringForce(length(springRight), distanceScalingFactor);
+
+		Pactive += Kspring * min(length(springForce), maxSpringForce) * normalize(springForce);
+
+		outputTexture[uint2(controlPointsIndex[pP], id.y)] = float4(Pactive, 1);
+	}
+}
+
+[numthreads(1, 1023, 1)]
+void SmoothingStep(uint3 id : SV_DispatchThreadID)
+{
+	for (int pP = 1; pP < nControlPoints - 1; pP++)
+	{
+		float3 Pstart = edgePositions[uint2(controlPointsIndex[pP - 1], id.y)];
+		float3 Pactive = edgePositions[uint2(controlPointsIndex[pP], id.y)];
+		float3 Pend = edgePositions[uint2(controlPointsIndex[pP + 1], id.y)];
+
+		Pactive = 0.3 * Pstart + 0.4 * Pactive + 0.3 * Pend;
+		outputTexture[uint2(controlPointsIndex[pP], id.y)] = float4(Pactive, 1);
+	}
+}
+
+
+
