@@ -33,4 +33,4 @@ Second Scene:
 - Note that each csv file need to have a header 
 - Edge connectivity data and topology data should be normalized to (-1, 1) (Both positive and negative connectivities can be shown on TempoCave)
 
-![](/READMEImages/StaticConnectome.png =250x250) ![](/READMEImages/DynamicConnectome.png =250x250)
+![](/READMEImages/StaticConnectome.png| width=100) ![](/READMEImages/DynamicConnectome.png | width=100)
