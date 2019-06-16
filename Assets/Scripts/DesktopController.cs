@@ -10,7 +10,7 @@ public class DesktopController : MonoBehaviour
 
     public float cameraHorizontalSpeed = 2.0f;
     public float cameraScrollSpeed = 1.0f;
-    public float connectomeRotateSpeed = 20.0f;
+    public float connectomeRotateSpeed = 10.0f;
     public List<string> selectedConnectome = new List<string>();
     public GameObject nodePrefab;
     public float connectomeHorizontalSpeed = 2.0f;
@@ -50,7 +50,8 @@ public class DesktopController : MonoBehaviour
     public List<GameObject> RightDynamicControllers;
     public GameObject leftTimeStep;
     public GameObject rightTimeStep;
-
+    Scene currentScene;
+    string sceneName;
     GameObject[] singleConnectomes;
     GameObject Connectome1;
     GameObject Connectome2;
@@ -65,7 +66,9 @@ public class DesktopController : MonoBehaviour
         //Fetch the Event System from the Scene
         m_EventSystem = GetComponent<EventSystem>();
         //if (_cube)
-            //_cube.SetActive(false);
+        //_cube.SetActive(false);
+        currentScene = SceneManager.GetActiveScene();
+        sceneName = currentScene.name;
 
     }
     
@@ -492,10 +495,15 @@ public class DesktopController : MonoBehaviour
             else
                 Connectome2 = singleConnectomes[1];
             dataLoader = GameObject.Find("DataLoader").GetComponent<DataLoader>();
-            isDynamic1 = dataLoader.isDynamicDictionaryGlobal[Connectome1.name];
-            isDynamic2 = dataLoader.isDynamicDictionaryGlobal[Connectome2.name];
-            timeStep1 = dataLoader.connectomeTimeStep[Connectome1.name];
-            timeStep2 = dataLoader.connectomeTimeStep[Connectome2.name];
+            if (sceneName == "Comparison")
+            {
+                isDynamic1 = dataLoader.isDynamicDictionaryGlobal[Connectome1.name];
+                isDynamic2 = dataLoader.isDynamicDictionaryGlobal[Connectome2.name];
+                timeStep1 = dataLoader.connectomeTimeStep[Connectome1.name];
+                timeStep2 = dataLoader.connectomeTimeStep[Connectome2.name];
+            }
+            
+           
         }
         if (_currentScene == (int)_scenesList.Selection)
             SelectionUI();
@@ -505,18 +513,22 @@ public class DesktopController : MonoBehaviour
             CameraAction();
             ComparisonUI();
         }
-        bool isSync1 = Connectome1.GetComponent<SingleConnectome>().isSync;
-        bool isSync2 = Connectome2.GetComponent<SingleConnectome>().isSync;
-        int currentTimeStep = 0;
-        if (isSync1)
+        
+        if(sceneName == "Comparison")
         {
-            currentTimeStep = Connectome1.GetComponent<SingleConnectome>().DynamicCurrentTime;
-            Connectome2.GetComponent<SingleConnectome>().DynamicCurrentTime = currentTimeStep;
-        }
-        if(isSync2)
-        {
-            currentTimeStep = Connectome2.GetComponent<SingleConnectome>().DynamicCurrentTime;
-            Connectome1.GetComponent<SingleConnectome>().DynamicCurrentTime = currentTimeStep;
+            bool isSync1 = Connectome1.GetComponent<SingleConnectome>().isSync;
+            bool isSync2 = Connectome2.GetComponent<SingleConnectome>().isSync;
+            int currentTimeStep = 0;
+            if (isSync1)
+            {
+                currentTimeStep = Connectome1.GetComponent<SingleConnectome>().DynamicCurrentTime;
+                Connectome2.GetComponent<SingleConnectome>().DynamicCurrentTime = currentTimeStep;
+            }
+            if (isSync2)
+            {
+                currentTimeStep = Connectome2.GetComponent<SingleConnectome>().DynamicCurrentTime;
+                Connectome1.GetComponent<SingleConnectome>().DynamicCurrentTime = currentTimeStep;
+            }
         }
     }
 

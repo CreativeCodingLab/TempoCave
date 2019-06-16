@@ -149,7 +149,6 @@ public class GPUEdgeBundling : MonoBehaviour
         Dictionary<string, string[][]> connectomeData = singleConnectome._connectomeData;
         string[][] edgesMatrix = singleConnectome._edgesMatrix;
         List<int> startNodeList = singleConnectome.StartNodeList;
-        
         if (connectomeData["NW"] != null)
             edgesMatrix = connectomeData["NW"];
         else if (connectomeData[singleConnectome.TimeStage] != null)

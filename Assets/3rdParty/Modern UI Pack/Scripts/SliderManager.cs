@@ -60,7 +60,14 @@ namespace Michsky.UI.ModernUIPack
                     connectomeParent = GameObject.FindGameObjectWithTag("SingleConnectomeDuplicate");
                 isDynamic = dataLoader.isDynamicDictionaryGlobal[connectomeParent.name];
                 if(!isDynamic && sliderName == "Speed")
+                {
                     this.transform.parent.parent.Find("Title").GetComponent<Text>().color = new Color(0.2f, 0.2f, 0.2f, 1.0f);
+                    ColorBlock cb = this.transform.GetComponent<Slider>().colors ;
+                    cb.normalColor = new Color(0.2f, 0.2f, 0.2f, 1.0f);
+                    this.transform.GetComponent<Slider>().colors = cb;
+                }
+                    
+
             }
             if (useRoundValue == true)
             {

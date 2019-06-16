@@ -6,8 +6,10 @@ Shader "Custom/EdgeGradient" {
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
 		_Glossiness("Smoothness", Range(0,1)) = 0.5
 		_Metallic("Metallic", Range(0,1)) = 0.0
-		[PerRendererData]_Color1("Endpoint1", Color) = (1,1,1,1)
-		[PerRendererData]_Color2("Endpoint2", Color) = (1,1,1,1)
+		//[PerRendererData]_Color1("Endpoint1", Color) = (1,1,1,1)
+		_Color1("Endpoint1", Color) = (1,0,0,1)
+		//[PerRendererData]_Color2("Endpoint2", Color) = (1,1,1,1)
+		_Color2("Endpoint2", Color) = (0,0,1,1)
 		[PerRendererData]_Alpha("Alpha", Float) = 1.0
 		_DashAmount("Dash Amount", Range(0, 50)) = 0
 		_WhiteBalance("White Balance", Range(0, 1)) = 0

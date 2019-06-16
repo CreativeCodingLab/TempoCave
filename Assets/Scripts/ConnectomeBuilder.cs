@@ -30,22 +30,52 @@ public class ConnectomeBuilder : MonoBehaviour
     public void Build(bool isOverlay, List<Dictionary<string, string[][]>> connectomeList, string[] connectomeNames, Dictionary<string, List<string>> connectomeRepresentationDictionary, Dictionary<string, List<string>> connectomeClassificationDictionary, Dictionary<string, Color> ColorCoding, Dictionary<string, bool> isDynamic, int isDuplicate, Dictionary<string, int> connectomeTimeStep, Dictionary<string, float[,]> modularityChangeTrackingDictionary, Dictionary<string, float[]> modularityFrequencyDictionary)
     {
         float n = connectomeNames.Length;
-        List<float> anglearray = new List<float>();
+        int numberConnectomes = int.Parse(n.ToString());
+        float[] anglearray = new float[numberConnectomes];
+        Scene currentScene = SceneManager.GetActiveScene();
+        string sceneName = currentScene.name;
+        bool isEven = false;
+        if (n % 2 == 0)
+            isEven = true;
+        else isEven = false;
 
-        if (isOverlay && n == 2.0f)
+
+        if(sceneName == "Selection")
         {
-            anglearray.Add(0.0f);
-            anglearray.Add(0.0f);
+            if (isEven)
+            {
+                int centerIndex = numberConnectomes / 2 - 1;
+                anglearray[numberConnectomes / 2 - 1] = 0;
+                for (int i = 0; i < centerIndex; i++)
+                    anglearray[i] = 0 - (centerIndex - i);
+                for (int i = centerIndex + 1; i < n; i++)
+                    anglearray[i] = i - centerIndex;
+            }
+            else
+            {
+                anglearray[0] = -(n - 1) / 2;
+                for (int j = 1; j < n; j++)
+                    anglearray[j] = anglearray[j - 1] + 1;
+            }  
+
         }
         else
         {
-            anglearray.Add(-(n - 1) / 2);
-            for (int j = 1; j < n; j++)
-                anglearray.Add(anglearray[j - 1] + 1);
+            if (isOverlay && n == 2.0f)
+            {
+                anglearray[0] = 0.0f;
+                anglearray[1] = 0.0f;
+            }
+            else
+            {
+                anglearray[0]= -(n - 1) / 2;
+                for (int j = 1; j < n; j++)
+                    anglearray[j]= anglearray[j - 1] + 1;
+            }
         }
+        
 
-        Scene currentScene = SceneManager.GetActiveScene();
-        string sceneName = currentScene.name;
+        
 
         List<Vector3> connectomePositionForDesktopInspectScene = new List<Vector3>();
         connectomePositionForDesktopInspectScene.Add(new Vector3(-2.0f, 0, -20));
@@ -71,6 +101,7 @@ public class ConnectomeBuilder : MonoBehaviour
             if (sceneName == "Selection")
                 ConnectomeTopLevel.transform.parent = ConnectomeContainer.transform;
             _connectomeTopLevelList.Add(ConnectomeTopLevel);
+            
             GameObject ConnectomeParent = Instantiate(_connectomeParentEmpty, new Vector3(posX, 0, posZ), Quaternion.identity);
             GameObject ConnectomeGlassBrain = Instantiate(_connectomeGlassBrain, new Vector3(posX, 0, posZ), Quaternion.identity);
             ConnectomeParent.transform.parent = ConnectomeTopLevel.transform;

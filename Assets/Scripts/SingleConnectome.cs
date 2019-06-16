@@ -177,7 +177,7 @@ public class SingleConnectome : MonoBehaviour
             }
             if (isEdgeBundling)
             {
-                if(_prevRepresentationType != _representationType)
+                if(_prevRepresentationType != _representationType || _prevClassificationType != _classificationType)
                     gpuEdgeBundling.EdgeBundling();
                 DrawEdgeBundling(thresholdMin, thresholdMax);
             } 
@@ -792,6 +792,8 @@ public class SingleConnectome : MonoBehaviour
         Vector3 edgePosition = new Vector3();
         Material edgeMaterial = new Material(Shader.Find("Custom/EdgeGradient"));
         float connectivityScale = 0;
+        if (StartNodeList.Count == 0)
+            SmoothingEdges = new List<Vector3[]>();
         if (SmoothingEdges.Count>0)
         {
             if (_connectomeData["NW"] != null)
@@ -908,7 +910,6 @@ public class SingleConnectome : MonoBehaviour
     {
         int segmentNum = (int)Mathf.Pow(2, edgeBundlingIterations);
         List<Vector3[]> EdgePosition = new List<Vector3[]>();
-        //print(EdgePosition.Count);
         Texture2D bundledEdges = gpuEdgeBundling.outputPositionTexture;
         if (bundledEdges)
         {
