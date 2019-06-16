@@ -9,12 +9,12 @@ You can download the built version, which does not require Unity platform.
 ### Instructions 
 Click TempoCave.exe to launch the app 
 
-Frist Scene: 
+Frist Scene Controls: 
 - Mouse scroll or left arrow/right arrow on keyboard to browse the connectomes available 
 - Mouse left click to select one or two connectomes 
 - Mouse left click/press enter on keyboard to inspect the connectomes selected 
 
-Second Scene: 
+Second Scene Controls: 
 - Hold mouse left button to rotate the connectome 
 - Press mouse scroll/right button to rotate the whole scene 
 - Click on the node to select/deselect the edges 
