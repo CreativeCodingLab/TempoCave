@@ -2070,7 +2070,7 @@ PrefabInstance:
         type: 3}
       propertyPath: edgePrefab
       value: 
-      objectReference: {fileID: 4643809588783634071, guid: 762d38f053aea5d47b56589089a2478d,
+      objectReference: {fileID: 2365705685148565793, guid: 762d38f053aea5d47b56589089a2478d,
         type: 3}
     - target: {fileID: 114047940256807540, guid: e33aa6607afda4f4aa496b3ad97b5784,
         type: 3}

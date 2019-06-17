@@ -6,13 +6,14 @@ Shader "Custom/EdgeGradient" {
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
 		_Glossiness("Smoothness", Range(0,1)) = 0.5
 		_Metallic("Metallic", Range(0,1)) = 0.0
-		//[PerRendererData]_Color1("Endpoint1", Color) = (1,1,1,1)
-		_Color1("Endpoint1", Color) = (1,0,0,1)
-		//[PerRendererData]_Color2("Endpoint2", Color) = (1,1,1,1)
-		_Color2("Endpoint2", Color) = (0,0,1,1)
-		[PerRendererData]_Alpha("Alpha", Float) = 1.0
 		_DashAmount("Dash Amount", Range(0, 50)) = 0
 		_WhiteBalance("White Balance", Range(0, 1)) = 0
+		[PerRendererData]_Color1("Endpoint1", Color) = (1,1,1,1)
+		//_Color1("Endpoint1", Color) = (1,0,0,1)
+		[PerRendererData]_Color2("Endpoint2", Color) = (1,1,1,1)
+		//_Color2("Endpoint2", Color) = (0,0,1,1)
+		[PerRendererData]_Alpha("Alpha", Float) = 1.0
+		
 		[PerRendererData]_isNegativeConnectivity("isNegativeConnectivity", Float) = 0
 		[PerRendererData]_isEdgeBundling("isEdgeBundling", Float) = 0
 		[PerRendererData]_edgeNumber("edgeNumber", Int) = 0
@@ -55,6 +56,7 @@ Shader "Custom/EdgeGradient" {
 		{
 			UNITY_INITIALIZE_OUTPUT(Input, o);
 			o.vertInObjSpace = v.vertex.xyz;
+			
 		}
 		// Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
 		// See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
@@ -65,12 +67,12 @@ Shader "Custom/EdgeGradient" {
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {
 			// Albedo comes from a texture tinted by color
-			float4 col;
-			fixed4 c = tex2D(_MainTex, IN.uv_MainTex) ;
+			//float4 col;
+			//fixed4 c = tex2D(_MainTex, IN.uv_MainTex);
 			//if (_isEdgeBundling == 0) 
-			{
-				c = c * lerp(float4(1, 1, 1, 1), lerp(_Color1, _Color2, IN.uv_MainTex.y), _WhiteBalance);
-				//c = c * lerp(float4(1, 1, 1, 1), lerp(float4(0, 1, 0, 1), float4(1, 0, 0, 1), IN.uv_MainTex.y), _WhiteBalance);
+			//{
+				//c = c * lerp(_Color1, _Color2, 0.9);
+				//c = c * lerp(float4(1, 1, 1, 1), lerp(_Color1, _Color2, IN.uv_MainTex.y), _WhiteBalance);
 				//if (_isNegativeConnectivity == 1)
 				//{
 					//if (IN.uv_MainTex.g > clamp(_SinTime.w, 0, 1) && IN.uv_MainTex.g - 0.08 < clamp(_SinTime.w, 0, 1))
@@ -88,7 +90,7 @@ Shader "Custom/EdgeGradient" {
 					//if (IN.vertInObjSpace.y > -0.1 && IN.vertInObjSpace.y < 0.1)
 						//c = float4(0.0, 1.0, 0.0, 1.0);
 				//}
-			}
+			//}
 			/*else
 			{
 				if (_edgeNumber == 15 || _edgeNumber == 16 || _edgeNumber == 17)
@@ -102,7 +104,7 @@ Shader "Custom/EdgeGradient" {
 				/*if (!step(sin(10 * IN.vertInObjSpace.y* _SinTime.w), 0.9f))
 					c = float4(1,0,0,1);*/
 
-			//fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * lerp(_Color1, _Color2, IN.uv_MainTex.y) * col;
+			fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * lerp(_Color1, _Color2, IN.uv_MainTex.y);
 			o.Albedo = c.rgb;
 			// Metallic and smoothness come from slider variables
 			o.Metallic = _Metallic;

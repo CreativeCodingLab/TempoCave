@@ -29,9 +29,9 @@ public class ConnectomeBuilder : MonoBehaviour
 
     public void Build(bool isOverlay, List<Dictionary<string, string[][]>> connectomeList, string[] connectomeNames, Dictionary<string, List<string>> connectomeRepresentationDictionary, Dictionary<string, List<string>> connectomeClassificationDictionary, Dictionary<string, Color> ColorCoding, Dictionary<string, bool> isDynamic, int isDuplicate, Dictionary<string, int> connectomeTimeStep, Dictionary<string, float[,]> modularityChangeTrackingDictionary, Dictionary<string, float[]> modularityFrequencyDictionary)
     {
-        float n = connectomeNames.Length;
+        int n = connectomeNames.Length;
         int numberConnectomes = int.Parse(n.ToString());
-        float[] anglearray = new float[numberConnectomes];
+        int[] anglearray = new int[numberConnectomes];
         Scene currentScene = SceneManager.GetActiveScene();
         string sceneName = currentScene.name;
         bool isEven = false;
@@ -48,6 +48,7 @@ public class ConnectomeBuilder : MonoBehaviour
                 anglearray[numberConnectomes / 2 - 1] = 0;
                 for (int i = 0; i < centerIndex; i++)
                     anglearray[i] = 0 - (centerIndex - i);
+                
                 for (int i = centerIndex + 1; i < n; i++)
                     anglearray[i] = i - centerIndex;
             }
@@ -61,10 +62,10 @@ public class ConnectomeBuilder : MonoBehaviour
         }
         else
         {
-            if (isOverlay && n == 2.0f)
+            if (isOverlay && n == 2)
             {
-                anglearray[0] = 0.0f;
-                anglearray[1] = 0.0f;
+                anglearray[0] = 0;
+                anglearray[1] = 0;
             }
             else
             {
@@ -74,9 +75,6 @@ public class ConnectomeBuilder : MonoBehaviour
             }
         }
         
-
-        
-
         List<Vector3> connectomePositionForDesktopInspectScene = new List<Vector3>();
         connectomePositionForDesktopInspectScene.Add(new Vector3(-2.0f, 0, -20));
         connectomePositionForDesktopInspectScene.Add(new Vector3(1.5f, 0, -20));   
@@ -86,12 +84,14 @@ public class ConnectomeBuilder : MonoBehaviour
         GameObject ConnectomeContainer = GameObject.Find("ConnectomeContainer");
 
         //for (int j = 1; j < connectomeList.Count; j++)
-            //anglearray[j] = anglearray[j - 1] + 1;
-        float angle = rotationRadius * 0.016f;
+        //anglearray[j] = anglearray[j - 1] + 1;
+        // float angle = rotationRadius * 0.016f;
+        float angle = 3.14f/9;
 
         for (int i = 0; i < connectomeNames.Length; i++)
         {
             float rotationAngle = angle * anglearray[i];
+            //print(rotationAngle);
             float posZ = -Mathf.Cos(rotationAngle) * rotationRadius;
             float posX = Mathf.Sin(rotationAngle) * rotationRadius;
 

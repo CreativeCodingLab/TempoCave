@@ -10,7 +10,7 @@ public class DesktopController : MonoBehaviour
 
     public float cameraHorizontalSpeed = 2.0f;
     public float cameraScrollSpeed = 1.0f;
-    public float connectomeRotateSpeed = 10.0f;
+    public float connectomeRotateSpeed = 5.0f;
     public List<string> selectedConnectome = new List<string>();
     public GameObject nodePrefab;
     public float connectomeHorizontalSpeed = 2.0f;
