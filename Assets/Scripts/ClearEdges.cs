@@ -52,6 +52,7 @@ public class ClearEdges : MonoBehaviour
                 if (result.gameObject.name == "ClearEdges")
                 {
                     connectomeParent.GetComponent<SingleConnectome>().ClearAllEdges();
+                    connectomeParent.GetComponent<SingleConnectome>().StartNodeList = new List<int>();
                 }
 
             }
