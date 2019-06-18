@@ -62,8 +62,9 @@ namespace Michsky.UI.ModernUIPack
                 if(!isDynamic && sliderName == "Speed")
                 {
                     this.transform.parent.parent.Find("Title").GetComponent<Text>().color = new Color(0.2f, 0.2f, 0.2f, 1.0f);
+                    this.transform.Find("Handle Slide Area").transform.Find("Handle").GetComponent<Image>().color = new Color(0.54f, 0.56f, 0.6f, 1.0f);
                     ColorBlock cb = this.transform.GetComponent<Slider>().colors ;
-                    cb.normalColor = new Color(0.2f, 0.2f, 0.2f, 1.0f);
+                    cb.normalColor = new Color(0.52f, 0.528f, 0.54f, 1.0f);
                     this.transform.GetComponent<Slider>().colors = cb;
                 }
                     
