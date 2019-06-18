@@ -1,7 +1,7 @@
 # TempoCave
 Visualizing dynamic connectome datasets to support cognitive behavioral therapy (CBT)
 ![](/READMEImages/teaser.PNG)
-![](/READMEImages/Fig2.png)
+![](/READMEImages/Fig2_new.png)
 ![](/READMEImages/Fig4-timeseries.png)
 TempoCave is a novel visualization application for analyzing dynamic brain networks, or connectomes. Tempocave provides a range of functionality to explore metrics related to the activity patterns and modular affiliations of different regions in the brain. These patterns are calculated by processing raw data retrieved functional magnetic resonance imaging (fMRI) scans, which creates a network of weighted edges between each brain region, where the weight indicates how likely these regions are to activate  synchronously. In particular, we support the analysis needs of clinical psychologists, who examine these modular affiliations and weighted edges and their temporal dynamics, utilizing them to understand relationships between neurological disorders and brain activity, which could have significant impact on the way in which patients are diagnosed and treated. TempoCave supports a range of comparative tasks and runs both in a desktop mode and in an immersive mode. 
 # How to use TempoCave
